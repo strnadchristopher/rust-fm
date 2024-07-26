@@ -5,15 +5,18 @@ extern crate image_base64;
 
 fn is_image(file: &PathBuf) -> bool{
     let file_extension = match file.extension(){
-        Some(file_extension) => file_extension.to_str().unwrap(),
+        Some(file_extension) => match file_extension.to_str(){
+            Some(file_extension) => file_extension.to_lowercase(),
+            _ => return false
+        },
         _ => return false
     };
     let image_extensions = vec!["png", "jpg", "jpeg", "gif", "bmp", "webp"];
-    image_extensions.contains(&file_extension)
+    image_extensions.contains(&file_extension.as_str())
 }
 use std::fs::File;
 use std::io::prelude::*;
-use base64::encode;
+use base64::{Engine as _, engine::general_purpose};
 fn get_image_base64(file_path_buffer: &PathBuf) -> Option<String>{
     println!("Converting to base64: {:?}", file_path_buffer);
     // Open the image file
@@ -24,7 +27,7 @@ fn get_image_base64(file_path_buffer: &PathBuf) -> Option<String>{
     file.read_to_end(&mut buffer).expect("Failed to read image file");
 
     // Encode the byte vector to Base64
-    let encoded = encode(&buffer);
+    let encoded = general_purpose::STANDARD.encode(&buffer);
     // println!("Encoded: {}", encoded);
     Some(encoded)
 }
@@ -32,21 +35,39 @@ fn get_image_base64(file_path_buffer: &PathBuf) -> Option<String>{
 pub fn get_directory_contents(directory_location: PathBuf) -> Vec<DirectoryItem>{
     println!("Directory: {:?}", directory_location);
 
-    // If directory_location is empty, return "/"
-    let directory_location = match directory_location.to_str().unwrap() {
-        "" => PathBuf::from("/"),
-        _ => directory_location
+    // If directory_location is empty, return the root of the drive, if it's windows, return the root of the current drive, if linux return the root "/"
+    let directory_location = match directory_location.to_str(){
+        Some(directory_location) => {
+            if directory_location.is_empty(){
+                match std::env::consts::OS{
+                    "windows" => PathBuf::from("C:\\"),
+                    _ => PathBuf::from("/")
+                }
+            }else{
+                PathBuf::from(directory_location)
+            }
+        },
+        _ => return Vec::new()
     };
     
     // Second, get the contents of the current directory
-    let contents = fs::read_dir(directory_location).unwrap();
+    let contents = match fs::read_dir(directory_location){
+        Ok(contents) => contents,
+        Err(_) => return Vec::new()
+    };
 
     // Add all the contents to a vector of strings
     let mut contents_vec: Vec<DirectoryItem> = Vec::new();
 
     for content in contents {
-        let content = content.unwrap();
-        let content_type = content.file_type().unwrap();
+        let content = match content{
+            Ok(content) => content,
+            Err(_) => continue
+        };
+        let content_type = match content.file_type(){
+            Ok(content_type) => content_type,
+            Err(_) => continue
+        };
         let file_type = match content_type.is_dir() {
             true => DirectoryItemType::Directory,
             _ => DirectoryItemType::File

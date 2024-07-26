@@ -2,10 +2,10 @@
 mod filesystem;
 
 // We need to add cors and allow all origins
+use rocket::fairing::{Fairing, Info, Kind};
 use rocket::http::{Header, Method};
 use rocket::{Request, Response};
-use rocket::fairing::{Fairing, Info, Kind};
-
+use std::path::PathBuf;
 // Cors set http ok status
 
 pub struct CORS;
@@ -23,7 +23,10 @@ impl Fairing for CORS {
         // Check if the request is an OPTIONS preflight request
         if request.method() == Method::Options {
             response.set_header(Header::new("Access-Control-Allow-Origin", "*"));
-            response.set_header(Header::new("Access-Control-Allow-Methods", "POST, GET, PATCH, OPTIONS"));
+            response.set_header(Header::new(
+                "Access-Control-Allow-Methods",
+                "POST, GET, PATCH, OPTIONS",
+            ));
             response.set_header(Header::new("Access-Control-Allow-Headers", "*"));
             response.set_status(rocket::http::Status::NoContent);
         } else {
@@ -33,15 +36,22 @@ impl Fairing for CORS {
     }
 }
 
-#[macro_use] extern crate rocket;
+#[macro_use]
+extern crate rocket;
 #[post("/", data = "<dir>")]
 fn hello(dir: String) -> String {
     // If dir is empty, return the current directory
     let dir_path = match dir.as_str() {
-        "" => std::env::current_dir().unwrap(),
+        "" => match std::env::current_dir() {
+            Ok(dir) => dir,
+            Err(_) => match std::env::consts::OS {
+                "windows" => PathBuf::from("C:\\"),
+                _ => PathBuf::from("/"),
+            },
+        },
         _ => {
             // If the dir path ends with "../", remove it as well as the previous directory
-            let fixed_dir = match dir.ends_with("../"){
+            let fixed_dir = match dir.ends_with("../") {
                 true => {
                     let dir_clone = dir.clone();
                     let mut dir_split = dir_clone.split("/").collect::<Vec<&str>>();
@@ -49,19 +59,21 @@ fn hello(dir: String) -> String {
                     dir_split.pop();
                     dir_split.pop();
                     dir_split.join("/")
-                },
-                _ => dir
+                }
+                _ => dir,
             };
-            
+
             std::path::PathBuf::from(fixed_dir)
         }
     };
 
-
     let current_dir = filesystem::Directory::new(dir_path);
 
     // Json stringify current_dir
-    let json = serde_json::to_string(&current_dir).unwrap();
+    let json = match serde_json::to_string(&current_dir){
+        Ok(json) => json,
+        Err(_) => return "Error".to_string()
+    };
 
     format!("{}", json)
 }
@@ -75,7 +87,8 @@ fn launch(filelocation: String) -> String {
 
 #[launch]
 fn rocket() -> _ {
-    rocket::build().attach(CORS)
-    .mount("/", routes![hello])
-    .mount("/", routes![launch])
+    rocket::build()
+        .attach(CORS)
+        .mount("/", routes![hello])
+        .mount("/", routes![launch])
 }
