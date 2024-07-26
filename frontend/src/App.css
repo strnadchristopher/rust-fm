@@ -1,0 +1,257 @@
+html, body, .App, #app>div {
+  height: 100vh
+}
+.App {
+  text-align: center;
+  min-height:100%;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.Toolbar{
+  width:100%;
+  height:3vh;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  position:fixed;
+  background:white;
+  z-index:5;
+  top:0;
+  border-bottom:2px solid grey;
+}
+
+.Directory-Tree, .Directory-Tree-Grid{
+  margin-top:4vh;
+}
+
+/* Disable text selection on Directory-Item */
+.Directory-Item, .Directory-Path-Text{
+  -webkit-user-select: none; /* Safari */        
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+  user-select: none; /* Standard */
+}
+
+.Directory-Path-Bar{
+  color:black;
+  width:100%;
+  padding:5px;
+  box-sizing: border-box;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.Directory-Path-Text{
+  color:black;
+  padding:5px;
+  margin:5px;
+  cursor:pointer;
+  transition:background 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  border-radius: 15px;
+  /* Add material design box shadow */
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+              0 1px 5px 0 rgba(0, 0, 0, 0.12),
+              0 3px 1px -2px rgba(0, 0, 0, 0.2);
+}
+
+.Directory-Path-Text:hover{
+  /* Hover animation for box shadow */
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 
+              0 10px 10px rgba(0,0,0,0.22);
+}
+
+
+.Directory-Display-Type-Toggle{
+  position:absolute;
+  top:50%;
+  right:15px;
+  transform:translateY(-50%);
+  border-radius:5px;
+  cursor:pointer;
+  width:20px;
+  padding:6px;
+  color:black;
+  background:white;
+  border:1px solid black;
+  transition:background 0.2s ease-in-out, color 0.2s ease-in-out, border-radius 0.2s ease-in-out;
+}
+
+.Directory-Display-Type-Toggle.Grid-Mode-Enabled{
+  background:black;
+  color:white;
+  border-radius: 10px;
+}
+
+.Directory-Tree{
+  display:flex;
+  flex-direction:row;
+  flex-wrap:wrap;
+  justify-content:center;
+  display:relative;
+  min-height:100%;
+}
+
+.Directory-Item{
+  width:100%;
+  text-align:left;
+  box-sizing: border-box;
+  padding:15px;
+  border:0;
+  position:relative;
+  border-bottom: 1px solid grey;
+  height:auto;
+  background:none;
+  transition:background 0.5s ease-in-out, height 0.5s ease-in-out, background-size 0.5s ease-in-out;
+  background-position: center;
+  background-size:cover;
+  background-repeat:no-repeat;
+  cursor: pointer;
+}
+
+.Directory-Item img{
+  max-height:90%;
+  width:auto;
+  position:absolute;
+  right:15px;
+  top:50%;
+  transform:translateY(-50%);
+}
+
+.Directory-Item p{
+  background:rgba(0, 0, 0, 0.2);
+  color:white;
+  width:auto;
+  padding:15px;
+  font-size: 1.5em;
+  position:absolute;
+  left: 5%;
+  top: 5%;
+}
+
+.Directory-Item-Grid{
+  width:100%;
+  text-align:left;
+  box-sizing: border-box;
+  padding:15px;
+  border:0;
+  position:relative;
+  border-bottom: 1px solid grey;
+  height:auto;
+  background:none;
+  transition:background 0.5s ease-in-out, height 0.5s ease-in-out, background-size 0.5s ease-in-out;
+  background-position: center;
+  background-size:cover;
+  background-repeat:no-repeat;
+  cursor: pointer;
+  border-radius: 15px;
+  min-width:140px;
+  width:auto;
+  height:140px;
+  display:inline-block;
+  margin:15px;
+  cursor:pointer;
+  padding:15px;
+  box-sizing: border-box;
+  transition: all 0.5s ease-in-out;
+  overflow:hidden;
+  border: 1px solid black;
+  background-position: center;
+  background-size:cover;
+  background-repeat:no-repeat;
+  transition: box-shadow 0.2s ease-in-out;
+  /* Add material design box shadow */
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+              0 1px 5px 0 rgba(0, 0, 0, 0.12),
+              0 3px 1px -2px rgba(0, 0, 0, 0.2);
+}
+
+.Directory-Item-Grid:hover{
+  /* Hover animation for box shadow */
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 
+              0 10px 10px rgba(0,0,0,0.22);
+}
+
+
+
+.Directory-Item-Grid.Directory-Item-Active p{
+  height:100%;
+}
+
+.Directory-Item-Grid img{
+  display:block;
+  min-width:100%;
+  min-height:100%;
+  aspect-ratio: auto;
+  width:auto;
+  height:auto;
+  position:absolute;
+  left:50%;
+  top:0;
+  transform:translate(-50%, 0);
+}
+
+.Directory-Item-Grid p{
+  position:absolute;
+  bottom:0;
+  max-width:100%;
+  margin:0;
+  left:0;
+  font-size:smaller;
+  text-align:center;
+  white-space: wrap;
+  background:white;
+  width:110%;
+  background:rgba(0,0,0,.5);
+  color:white;
+  word-break: break-all;
+  white-space: normal;
+  padding-left:5px;
+  padding-right:5px;
+  padding-top:2px;
+  padding-bottom:2px;
+  box-sizing: border-box;
+  background:rgba(0, 0, 0, 0.2);
+  color:white;
+  width:100%;
+  padding:15px;
+  transition:height 0.2s ease-in-out;
+  height:fit-content;
+}
+
+.Directory-Item-Grid:hover > p{
+}
